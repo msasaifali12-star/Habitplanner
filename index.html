@@ -1,0 +1,1523 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Habit Planner</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f5ff;
+            color: #333;
+            padding: 25px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        /* HEADER */
+
+        header {
+            background: linear-gradient(135deg, #6c63ff, #918aff);
+            color: white;
+            padding: 25px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        header h1 {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            opacity: 0.9;
+        }
+
+        /* BUTTON */
+
+        button {
+            border: none;
+            padding: 11px 17px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .btn-reset {
+            background: #ff5252;
+            color: white;
+        }
+
+        .btn-add {
+            background: #6c63ff;
+            color: white;
+        }
+
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-dark {
+            background: #343a40;
+            color: white;
+        }
+
+        .btn-print {
+            background: #3498db;
+            color: white;
+        }
+
+        /* CARDS */
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 15px;
+
+            box-shadow:
+                0 5px 15px rgba(0,0,0,0.07);
+        }
+
+        .card h3 {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 27px;
+            font-weight: bold;
+            color: #6c63ff;
+        }
+
+        /* PROGRESS */
+
+        .progress-box {
+            background: white;
+            padding: 22px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 5px 15px rgba(0,0,0,0.07);
+        }
+
+        .progress-title {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .progress {
+            height: 18px;
+            background: #e5e5e5;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(
+                90deg,
+                #6c63ff,
+                #a39dff
+            );
+
+            transition: 0.4s;
+        }
+
+        /* TABLE */
+
+        .table-box {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 5px 15px rgba(0,0,0,0.07);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: max-content;
+            min-width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            min-width: 38px;
+        }
+
+        th {
+            background: #6c63ff;
+            color: white;
+        }
+
+        th:first-child,
+        td:first-child {
+            min-width: 200px;
+            position: sticky;
+            left: 0;
+        }
+
+        th:first-child {
+            background: #5148d8;
+        }
+
+        td:first-child {
+            background: white;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        input[type="checkbox"] {
+            width: 19px;
+            height: 19px;
+            cursor: pointer;
+            accent-color: #6c63ff;
+        }
+
+        .habit-name {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .delete-habit {
+            background: #ff5252;
+            color: white;
+            padding: 5px 8px;
+            font-size: 11px;
+        }
+
+        /* ADD HABIT */
+
+        .add-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .add-box input {
+            flex: 1;
+            padding: 12px;
+
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        /* REKAP */
+
+        .rekap {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 5px 15px rgba(0,0,0,0.07);
+        }
+
+        .rekap h2 {
+            margin-bottom: 18px;
+        }
+
+        .rekap-item {
+            margin-bottom: 18px;
+        }
+
+        .rekap-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        .mini-progress {
+            height: 12px;
+            background: #e5e5e5;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .mini-bar {
+            height: 100%;
+            background: #6c63ff;
+            transition: 0.3s;
+        }
+
+        /* GRAFIK */
+
+        .chart-box {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 5px 15px rgba(0,0,0,0.07);
+        }
+
+        .chart-box h2 {
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 400px;
+        }
+
+        /* CATATAN */
+
+        .notes {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 5px 15px rgba(0,0,0,0.07);
+        }
+
+        textarea {
+            width: 100%;
+            height: 130px;
+
+            resize: vertical;
+
+            border: 1px solid #ccc;
+            border-radius: 10px;
+
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        /* FOOTER */
+
+        footer {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+        }
+
+        /* PRINT */
+
+        @media print {
+
+            button,
+            .add-box,
+            .notes textarea {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .chart-box {
+                box-shadow: none;
+            }
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 700px) {
+
+            body {
+                padding: 12px;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <header>
+
+        <div>
+
+            <h1>📅 My Habit Planner</h1>
+
+            <p>
+                Bangun kebiasaan baik setiap hari.
+            </p>
+
+        </div>
+
+        <button
+            class="btn-reset"
+            onclick="resetPlanner()">
+
+            🔄 Reset Planner
+
+        </button>
+
+    </header>
+
+
+    <!-- INFO -->
+
+    <section class="cards">
+
+        <div class="card">
+
+            <h3>📆 Bulan</h3>
+
+            <p id="month"></p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>🎯 Total Habit</h3>
+
+            <p id="totalHabit">0</p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>📊 Progress</h3>
+
+            <p id="totalProgress">0%</p>
+
+        </div>
+
+    </section>
+
+
+    <!-- PROGRESS -->
+
+    <section class="progress-box">
+
+        <div class="progress-title">
+
+            <span>
+                Monthly Progress
+            </span>
+
+            <span id="progressText">
+                0%
+            </span>
+
+        </div>
+
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                id="progressBar">
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- HABIT TRACKER -->
+
+    <section class="table-box">
+
+        <div class="table-header">
+
+            <h2>
+                📝 Habit Tracker
+            </h2>
+
+
+            <div class="button-group">
+
+                <button
+                    class="btn-success"
+                    onclick="checkAll()">
+
+                    ✓ Tandai Semua
+
+                </button>
+
+
+                <button
+                    class="btn-warning"
+                    onclick="uncheckAll()">
+
+                    ✕ Hapus Semua
+
+                </button>
+
+
+                <button
+                    class="btn-print"
+                    onclick="window.print()">
+
+                    🖨 Cetak Rekapan
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr id="dayRow">
+
+                        <th>
+                            Habit
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="habitTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="add-box">
+
+            <input
+                type="text"
+                id="habitInput"
+                placeholder="Contoh: Sholat tepat waktu">
+
+            <button
+                class="btn-add"
+                onclick="addHabit()">
+
+                ＋ Tambah Habit
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- REKAP -->
+
+    <section class="rekap">
+
+        <h2>
+            📊 Rekapan Progress
+        </h2>
+
+        <div id="rekapContainer">
+
+        </div>
+
+    </section>
+
+
+    <!-- GRAFIK -->
+
+    <section class="chart-box">
+
+        <h2>
+            📈 Diagram Progress Habit
+        </h2>
+
+        <div class="chart-container">
+
+            <canvas id="habitChart"></canvas>
+
+        </div>
+
+    </section>
+
+
+    <!-- CATATAN -->
+
+    <section class="notes">
+
+        <h2>
+            📖 Catatan
+        </h2>
+
+        <br>
+
+        <textarea
+            id="notes"
+            placeholder="Tulis target atau evaluasi kamu di sini...">
+        </textarea>
+
+        <br>
+
+        <button
+            class="btn-dark"
+            onclick="saveNotes()">
+
+            💾 Simpan Catatan
+
+        </button>
+
+    </section>
+
+
+    <footer>
+
+        © 2026 My Habit Planner | Keep Going 💪
+
+    </footer>
+
+</div>
+
+
+<script>
+
+    /* ============================
+       DATA HABIT
+    ============================ */
+
+    let habits = [
+
+        "Bangun pagi",
+        "Olahraga",
+        "Minum air 2L",
+        "Membaca buku",
+        "Belajar",
+        "Tidur sebelum 23.00"
+
+    ];
+
+
+    /* ============================
+       TANGGAL
+    ============================ */
+
+    const today = new Date();
+
+    const year = today.getFullYear();
+
+    const month = today.getMonth();
+
+    const daysInMonth =
+        new Date(
+            year,
+            month + 1,
+            0
+        ).getDate();
+
+
+    /* ============================
+       BULAN
+    ============================ */
+
+    const monthNames = [
+
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "November",
+        "Desember"
+
+    ];
+
+
+    document.getElementById("month").innerText =
+        monthNames[month] + " " + year;
+
+
+    /* ============================
+       CHART
+    ============================ */
+
+    let habitChart;
+
+
+    /* ============================
+       BUAT HARI
+    ============================ */
+
+    function createDays() {
+
+        const row =
+            document.getElementById("dayRow");
+
+        row.innerHTML = "<th>Habit</th>";
+
+
+        for (
+            let i = 1;
+            i <= daysInMonth;
+            i++
+        ) {
+
+            row.innerHTML += `
+                <th>${i}</th>
+            `;
+
+        }
+
+    }
+
+
+    /* ============================
+       RENDER HABIT
+    ============================ */
+
+    function renderHabits() {
+
+        const table =
+            document.getElementById(
+                "habitTable"
+            );
+
+        table.innerHTML = "";
+
+
+        habits.forEach(
+            (habit, habitIndex) => {
+
+                let row = `
+
+                    <tr>
+
+                        <td>
+
+                            <div class="habit-name">
+
+                                <span>
+                                    ${habit}
+                                </span>
+
+                                <button
+                                    class="delete-habit"
+                                    onclick="deleteHabit(${habitIndex})">
+
+                                    🗑
+
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                `;
+
+
+                for (
+                    let day = 1;
+                    day <= daysInMonth;
+                    day++
+                ) {
+
+                    const saved =
+                        localStorage.getItem(
+                            `habit-${habitIndex}-${day}`
+                        );
+
+
+                    const checked =
+                        saved === "true"
+                        ? "checked"
+                        : "";
+
+
+                    row += `
+
+                        <td>
+
+                            <input
+                                type="checkbox"
+                                id="habit-${habitIndex}-${day}"
+                                ${checked}
+                                onchange="updateAll()">
+
+                        </td>
+
+                    `;
+
+                }
+
+
+                row += "</tr>";
+
+
+                table.innerHTML += row;
+
+            }
+        );
+
+
+        updateAll();
+
+    }
+
+
+    /* ============================
+       UPDATE SEMUA
+    ============================ */
+
+    function updateAll() {
+
+        saveCheckboxes();
+
+        updateInfo();
+
+        updateProgress();
+
+        updateRekap();
+
+        updateChart();
+
+    }
+
+
+    /* ============================
+       UPDATE INFO
+    ============================ */
+
+    function updateInfo() {
+
+        document.getElementById(
+            "totalHabit"
+        ).innerText = habits.length;
+
+    }
+
+
+    /* ============================
+       PROGRESS
+    ============================ */
+
+    function updateProgress() {
+
+        const boxes =
+            document.querySelectorAll(
+                'input[type="checkbox"]'
+            );
+
+
+        if (boxes.length === 0) {
+
+            setProgress(0);
+
+            return;
+
+        }
+
+
+        let checked = 0;
+
+
+        boxes.forEach(box => {
+
+            if (box.checked) {
+
+                checked++;
+
+            }
+
+        });
+
+
+        const percentage =
+            Math.round(
+                (checked / boxes.length) * 100
+            );
+
+
+        setProgress(percentage);
+
+    }
+
+
+    function setProgress(percentage) {
+
+        document.getElementById(
+            "totalProgress"
+        ).innerText =
+            percentage + "%";
+
+
+        document.getElementById(
+            "progressText"
+        ).innerText =
+            percentage + "%";
+
+
+        document.getElementById(
+            "progressBar"
+        ).style.width =
+            percentage + "%";
+
+    }
+
+
+    /* ============================
+       REKAP
+    ============================ */
+
+    function updateRekap() {
+
+        const container =
+            document.getElementById(
+                "rekapContainer"
+            );
+
+
+        container.innerHTML = "";
+
+
+        habits.forEach(
+            (habit, habitIndex) => {
+
+                let checked = 0;
+
+
+                for (
+                    let day = 1;
+                    day <= daysInMonth;
+                    day++
+                ) {
+
+                    const box =
+                        document.getElementById(
+                            `habit-${habitIndex}-${day}`
+                        );
+
+
+                    if (
+                        box &&
+                        box.checked
+                    ) {
+
+                        checked++;
+
+                    }
+
+                }
+
+
+                const percentage =
+                    Math.round(
+                        (checked / daysInMonth) * 100
+                    );
+
+
+                container.innerHTML += `
+
+                    <div class="rekap-item">
+
+                        <div class="rekap-top">
+
+                            <span>
+                                ${habit}
+                            </span>
+
+                            <span>
+                                ${checked}/${daysInMonth}
+                                hari
+                                (${percentage}%)
+                            </span>
+
+                        </div>
+
+
+                        <div class="mini-progress">
+
+                            <div
+                                class="mini-bar"
+                                style="width:${percentage}%">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+    }
+
+
+    /* ============================
+       DIAGRAM
+    ============================ */
+
+    function updateChart() {
+
+        const labels = [];
+
+        const data = [];
+
+
+        habits.forEach(
+            (habit, habitIndex) => {
+
+                let checked = 0;
+
+
+                for (
+                    let day = 1;
+                    day <= daysInMonth;
+                    day++
+                ) {
+
+                    const box =
+                        document.getElementById(
+                            `habit-${habitIndex}-${day}`
+                        );
+
+
+                    if (
+                        box &&
+                        box.checked
+                    ) {
+
+                        checked++;
+
+                    }
+
+                }
+
+
+                const percentage =
+                    Math.round(
+                        (checked / daysInMonth) * 100
+                    );
+
+
+                labels.push(habit);
+
+                data.push(percentage);
+
+            }
+        );
+
+
+        const ctx =
+            document.getElementById(
+                "habitChart"
+            );
+
+
+        if (habitChart) {
+
+            habitChart.destroy();
+
+        }
+
+
+        habitChart =
+            new Chart(
+                ctx,
+                {
+
+                    type: "bar",
+
+                    data: {
+
+                        labels: labels,
+
+                        datasets: [
+
+                            {
+
+                                label:
+                                    "Progress Habit (%)",
+
+                                data: data,
+
+                                borderWidth: 1
+
+                            }
+
+                        ]
+
+                    },
+
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        scales: {
+
+                            y: {
+
+                                beginAtZero: true,
+
+                                max: 100,
+
+                                title: {
+
+                                    display: true,
+
+                                    text:
+                                        "Persentase (%)"
+
+                                }
+
+                            },
+
+                            x: {
+
+                                title: {
+
+                                    display: true,
+
+                                    text:
+                                        "Nama Habit"
+
+                                }
+
+                            }
+
+                        },
+
+
+                        plugins: {
+
+                            legend: {
+
+                                display: true
+
+                            },
+
+                            tooltip: {
+
+                                callbacks: {
+
+                                    label:
+                                        function(context) {
+
+                                            return (
+                                                " Progress: "
+                                                +
+                                                context.raw
+                                                +
+                                                "%"
+                                            );
+
+                                        }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            );
+
+    }
+
+
+    /* ============================
+       TAMBAH HABIT
+    ============================ */
+
+    function addHabit() {
+
+        const input =
+            document.getElementById(
+                "habitInput"
+            );
+
+
+        const habit =
+            input.value.trim();
+
+
+        if (habit === "") {
+
+            alert(
+                "Silakan masukkan nama habit!"
+            );
+
+            return;
+
+        }
+
+
+        habits.push(habit);
+
+        input.value = "";
+
+
+        saveHabits();
+
+        renderHabits();
+
+    }
+
+
+    /* ============================
+       HAPUS HABIT
+    ============================ */
+
+    function deleteHabit(index) {
+
+        if (
+            !confirm(
+                "Yakin ingin menghapus habit ini?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        habits.splice(index, 1);
+
+        saveHabits();
+
+        renderHabits();
+
+    }
+
+
+    /* ============================
+       TANDAI SEMUA
+    ============================ */
+
+    function checkAll() {
+
+        document
+            .querySelectorAll(
+                'input[type="checkbox"]'
+            )
+            .forEach(box => {
+
+                box.checked = true;
+
+            });
+
+
+        updateAll();
+
+    }
+
+
+    /* ============================
+       HAPUS SEMUA CHECKLIST
+    ============================ */
+
+    function uncheckAll() {
+
+        document
+            .querySelectorAll(
+                'input[type="checkbox"]'
+            )
+            .forEach(box => {
+
+                box.checked = false;
+
+            });
+
+
+        updateAll();
+
+    }
+
+
+    /* ============================
+       SIMPAN CHECKBOX
+    ============================ */
+
+    function saveCheckboxes() {
+
+        document
+            .querySelectorAll(
+                'input[type="checkbox"]'
+            )
+            .forEach(box => {
+
+                localStorage.setItem(
+                    box.id,
+                    box.checked
+                );
+
+            });
+
+    }
+
+
+    /* ============================
+       SIMPAN HABIT
+    ============================ */
+
+    function saveHabits() {
+
+        localStorage.setItem(
+            "habits",
+            JSON.stringify(habits)
+        );
+
+    }
+
+
+    /* ============================
+       LOAD HABIT
+    ============================ */
+
+    function loadHabits() {
+
+        const saved =
+            localStorage.getItem(
+                "habits"
+            );
+
+
+        if (saved) {
+
+            habits =
+                JSON.parse(saved);
+
+        }
+
+    }
+
+
+    /* ============================
+       CATATAN
+    ============================ */
+
+    function saveNotes() {
+
+        const notes =
+            document.getElementById(
+                "notes"
+            ).value;
+
+
+        localStorage.setItem(
+            "habitNotes",
+            notes
+        );
+
+
+        alert(
+            "Catatan berhasil disimpan! 💾"
+        );
+
+    }
+
+
+    function loadNotes() {
+
+        const notes =
+            localStorage.getItem(
+                "habitNotes"
+            );
+
+
+        if (notes) {
+
+            document.getElementById(
+                "notes"
+            ).value = notes;
+
+        }
+
+    }
+
+
+    /* ============================
+       RESET
+    ============================ */
+
+    function resetPlanner() {
+
+        if (
+            !confirm(
+                "Semua progress akan dihapus. Yakin?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        document
+            .querySelectorAll(
+                'input[type="checkbox"]'
+            )
+            .forEach(box => {
+
+                box.checked = false;
+
+                localStorage.removeItem(
+                    box.id
+                );
+
+            });
+
+
+        localStorage.removeItem(
+            "habitNotes"
+        );
+
+
+        document.getElementById(
+            "notes"
+        ).value = "";
+
+
+        updateAll();
+
+
+        alert(
+            "Planner berhasil di-reset!"
+        );
+
+    }
+
+
+    /* ============================
+       ENTER
+    ============================ */
+
+    document
+        .getElementById("habitInput")
+        .addEventListener(
+            "keypress",
+            function(event) {
+
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    addHabit();
+
+                }
+
+            }
+        );
+
+
+    /* ============================
+       START
+    ============================ */
+
+    createDays();
+
+    loadHabits();
+
+    renderHabits();
+
+    loadNotes();
+
+</script>
+
+</body>
+</html>
+
